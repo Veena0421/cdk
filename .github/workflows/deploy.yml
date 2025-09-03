@@ -28,10 +28,23 @@ jobs:
           aws-region: us-east-1 # Make sure this is your AWS region
 
       # Step 3: Set up Node.js, which is needed for the CDK
+      # ... (previous steps like checkout, configure aws, setup node)
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '18'
+
+      # ADD THIS NEW STEP
+      - name: Install AWS CDK
+        run: npm install -g aws-cdk
+
+      - name: Install CDK Dependencies
+        run: |
+          cd cdk
+          npm install
+
+# ... (the rest of the file)
 
       # Step 4: Install the CDK project's dependencies
       - name: Install CDK Dependencies
