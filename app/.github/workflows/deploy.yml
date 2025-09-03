@@ -1,0 +1,46 @@
+name: Deploy to AWS ECS
+
+# This workflow runs on any push to the 'main' branch
+on:
+  push:
+    branches:
+      - main
+
+# These permissions are required for the OIDC connection to AWS
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Check out your repository code
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Step 2: Configure the connection to your AWS account
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          # PASTE THE ROLE ARN YOU COPIED FROM AWS HERE
+          role-to-assume: arn:aws:iam::275057777737:role/GitHubActions-CDK-DeployRole
+          aws-region: us-east-1 # Make sure this is your AWS region
+
+      # Step 3: Set up Node.js, which is needed for the CDK
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # Step 4: Install the CDK project's dependencies
+      - name: Install CDK Dependencies
+        run: |
+          cd cdk
+          npm install
+
+      # Step 5: Run the CDK deploy command
+      - name: Deploy with AWS CDK
+        run: |
+          cd cdk
+          cdk deploy --require-approval never
